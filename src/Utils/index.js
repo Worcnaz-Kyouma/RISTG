@@ -18,7 +18,7 @@ function processRawColumn(rawColumn){
     return column
 }
 
-function processExternalSource(source){
+export function processExternalSource(source){
     let rawColumns = source.replace(/\[/, '').split(', [')
 
     //console.log(rawColumns)
@@ -51,6 +51,5 @@ function generateExternal(external){
 function generateMerge(merge){
 
 }
-
-module.exports = generateExternal
 */
+

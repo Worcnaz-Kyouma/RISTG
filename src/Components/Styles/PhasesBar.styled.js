@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const ProgressBar = styled.div`
-    position:relative;
+    position: relative;
 
     display: flex;
     flex-direction: column;
@@ -10,7 +10,7 @@ export const ProgressBar = styled.div`
 
     margin: auto;
     width: 5px;
-    height: 90%;
+    height: 93%;
     border-radius: 10%;
 
     background-color: rgb(165, 164, 164);
