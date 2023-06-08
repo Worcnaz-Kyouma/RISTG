@@ -26,23 +26,107 @@ export function processExternalSource(source){
     return columns
 }
 
-
 function generateFiles(form){
-    const { origin, processedSource, externalName, tablesName/*stgTableName, tableName*/, mergesName/*stgMergeName,  mergeName*/, whereClause, mergeKeys } = form;
+    const { databaseName/*content.js -> Home.jsx -> index.js*/, origin, processedSource, externalName, tablesName/*stgTableName, tableName*/, mergesName/*stgMergeName,  mergeName*/, whereClause, mergeKeys } = form;
     let files = {
-        external: generateExternal(externalName, processedSource, origin, mergesName.stgMergeName, tablesName),
-        mergeStg: generateMerge(mergesName.stgMergeName, tablesName.stgTableName, externalName, whereClause, mergeKeys, processedSource),
-        merge: generateMerge(mergesName.mergeName, tablesName.tableName, tablesName.stgTableName, processedSource)
+        external: generateExternalBlob(databaseName, externalName, processedSource, origin, mergesName.stgMergeName, tablesName),
+        mergeStg: generateMergeBlob(mergesName.stgMergeName, tablesName.stgTableName, externalName, processedSource, mergeKeys, whereClause, databaseName),
+        merge: generateMergeBlob(mergesName.mergeName, tablesName.tableName, tablesName.stgTableName, processedSource, mergeKeys)
     }
     return files
 }
 
-function generateExternal(external){
+function generateExternalBlob(databaseName, externalName, processedSource, origin, stgMergeName, tablesName){
+    const columnsAccumulated = (haveCollate) => processedSource.reduce((accumulator, currentColumn) => {
+        return (
+        `${accumulator}
+        ,   [${currentColumn.name}]     ${currentColumn.type}      ${(haveCollate) ? currentColumn.options.collate || "NOT NULL" : "NOT NULL"}
+        `
+        )
+      }, `  [${processedSource[0].name}]    ${processedSource[0].type}     ${processedSource[0].options.collate || "NOT NULL"}` )
+    
+    const externalText = 
+    `use ${databaseName}
 
+    CREATE EXTERNAL TABLE [dbo].${externalName}
+    (
+      ${columnsAccumulated(true)}
+    )
+    WITH (DATA_SOURCE = [${origin[0]}],LOCATION = N'${origin[1]+externalName}')
+    GO
+    
+    --Teste external
+    --select * from ${externalName}
+    
+    use Frisia
+    --select * from PARAMETRO order by 1 desc
+    insert into parametro values ( (select max(cd_parametro) + 1 from PARAMETRO), 
+                                    '${stgMergeName}', 
+                                    'NOME DA PROCEDURE', 
+                                    -1, 
+                                    getdate(),
+                                    (select cast(getdate() -1 as date))
+                                  )
+    
+    CREATE TABLE ${tablesName.stgTableName}
+    (
+        ${columnsAccumulated(false)}            
+    )
+    
+    CREATE TABLE ${tablesName.tableName}
+    (
+        ${columnsAccumulated(false)}
+        , DT_INCLUIDO_DW				DATETIME
+        , DT_ALTERADO_DW				DATETIME
+    )
+    `
+    
+    return externalText;
+    //return new Blob([externalText], {type: "application/sql"})
 }
 
-function generateMerge(merge){
+function generateMergeBlob(mergeName, targetTable, sourceTable, processedSource, mergeKeys, whereClause=false, databaseName=false){
+    const mergeText = 
+    `USE FRISIA
+    GO
+    
+    create or ALTER procedure [dbo].${mergeName}  ${(databaseName) && "@ControlaData bit"} as 
+    
+    ${(databaseName) && "truncate table " + targetTable}
+    
+    MERGE ${targetTable} as TARGET
+        USING (
+                SELECT * FROM ${databaseName ? databaseName + ".dbo." : ""}${sourceTable}
+                    ${whereClause}	
+              ) 
+              AS SOURCE ON (                      		 
+                    ${mergeKeys}						
+              )
+        WHEN MATCHED 
+        THEN 
+            UPDATE SET 
+                     [CD_EMPRESA]					= SOURCE.[CD_EMPRESA]					
+                   , [CD_FILIAL]					= SOURCE.[CD_FILIAL]								
+                
+        WHEN NOT MATCHED THEN
+            INSERT (				 
+                      [CD_EMPRESA]					
+                    , [CD_FILIAL]					
+                                        
+            )
+            VALUES 
+            (
+                     SOURCE.[CD_EMPRESA]					
+                   , SOURCE.[CD_FILIAL]					
+                               
+                );
+    update 	Frisia.dbo.PARAMETRO  set [DT_EXECUCAO] = getdate() 
+    where [NM_PARAMETRO] = ${mergeName}
+    GO
+    `
 
+    return mergeText;
+    //return new Blob([], {type: "application/sql"})
 }
 
 
