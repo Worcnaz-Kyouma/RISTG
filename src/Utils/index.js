@@ -81,8 +81,8 @@ function generateExternalBlob(databaseName, externalName, processedSource, origi
     )
     `
     
-    return externalText;
-    //return new Blob([externalText], {type: "application/sql"})
+    //return externalText;
+    return new Blob([externalText], {type: "application/sql"})
 }
 
 function generateMergeBlob(mergeName, targetTable, sourceTable, processedSource, mergeKeys, whereClause, databaseName=false){
@@ -139,6 +139,6 @@ function generateMergeBlob(mergeName, targetTable, sourceTable, processedSource,
     GO
     `
 
-    return mergeText;
-    //return new Blob([], {type: "application/sql"})
+    //return mergeText;
+    return new Blob([mergeText], {type: "application/sql"})
 }

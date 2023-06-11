@@ -7,12 +7,15 @@ export const PhasesBarWrapper = styled.div`
 `
 
 export const PhasesForm = styled.form`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
     flex-grow: 9;
 `
 
 export const PhaseDiv = styled.div`
     width: 90%;
-    margin: auto;
     height: 100px;
     background-color: rgb(233, 233, 233);
     border-bottom-left-radius: 25px 8px;
