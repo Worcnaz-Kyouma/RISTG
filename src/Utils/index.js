@@ -37,10 +37,14 @@ export function generateFiles(form){
 }
 
 function generateExternalBlob(databaseName, externalName, processedSource, origin, stgMergeName, tablesName){
+    const lenghtLongestColumnName = processedSource.map(column => column.name).reduce((longestColumn, currentColumn) => currentColumn.lenght>longestColumn.lenght ? currentColumn : longestColumn).lenght
+    
+    const numOfAdditionalTabs = (column) => {return  -Math.round(-(lenghtLongestColumnName-column.length)/8)}
+
     const columnsAccumulated = (haveCollate=false) => processedSource.slice(1).reduce((accumulator, currentColumn) => {
         return (
         `${accumulator}
-        ,   [${currentColumn.name}]     ${currentColumn.type}      ${(haveCollate) ? currentColumn.options.collate || "NOT NULL" : "NOT NULL"}
+        ,   [${currentColumn.name}]${[...Array(1+numOfAdditionalTabs(column))].map((cell=>cell="\t")).join('')}${currentColumn.type}\t${(haveCollate) ? currentColumn.options.collate || "NOT NULL" : "NOT NULL"}
         `
         )
       }, `  [${processedSource[0].name}]    ${processedSource[0].type}     ${processedSource[0].options.collate || "NOT NULL"}` )
