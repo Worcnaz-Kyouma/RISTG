@@ -1,4 +1,3 @@
-//test note
 function processRawColumn(rawColumn){
     let column = {
         name: '',
