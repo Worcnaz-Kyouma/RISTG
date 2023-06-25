@@ -18,10 +18,18 @@ function processRawColumn(rawColumn){
     return column
 }
 
+let lengthLongestColumnName;
+let lengthLongestColumnType;
+let numOfAdditionalTabs;
 export function processExternalSource(source){
     let rawColumns = source.replace(/\[/, '').split(', [')
 
     let columns = rawColumns.map(processRawColumn)
+
+    lengthLongestColumnName = columns.map(column => column.name).reduce((longestColumn, currentColumn) => currentColumn.length>longestColumn.length ? currentColumn : longestColumn).length
+    lengthLongestColumnType = columns.map(column => column.type).reduce((longestType, currentType) => currentType.length>longestType.length ? currentType : longestType).length
+    
+    numOfAdditionalTabs = (longestColumnLength, columnLength) => {return  ((columnLength)%4!=0 && 1) + ((longestColumnLength+4-((longestColumnLength)%4||4))-(columnLength+4-((columnLength)%4||4)))/4}
 
     return columns
 }
@@ -37,17 +45,11 @@ export function generateFiles(form){
 }
 
 function generateExternalBlob(databaseName, externalName, processedSource, origin, stgMergeName, tablesName){
-    const lengthLongestColumnName = processedSource.map(column => column.name).reduce((longestColumn, currentColumn) => currentColumn.length>longestColumn.length ? currentColumn : longestColumn).length
-    
-    const numOfAdditionalTabs = (columnLength) => {return  ((columnLength+2)%4!=0 && 1) + ((lengthLongestColumnName+6-((lengthLongestColumnName+2)%4||4))-(columnLength+6-((columnLength+2)%4||4)))/4}
-
-    console.log(numOfAdditionalTabs(processedSource[0].name.length));
-
     const columnsAccumulated = (haveCollate=false) => processedSource.slice(1).reduce((accumulator, currentColumn) => {
         return (
-`${accumulator}\n,   [${currentColumn.name}]${[...Array(1+numOfAdditionalTabs(currentColumn.name.length))].map((()=>"\t")).join('')}${currentColumn.type}\t${(haveCollate) ? currentColumn.options.collate || "NOT NULL" : "NOT NULL"}`
+`${accumulator}\n,   [${currentColumn.name}]${[...Array(1+numOfAdditionalTabs(lengthLongestColumnName+2, currentColumn.name.length+2))].map((()=>"\t")).join('')}${currentColumn.type}${[...Array(1+numOfAdditionalTabs(lengthLongestColumnType, currentColumn.type.length))].map((()=>"\t")).join('')}${(haveCollate) ? currentColumn.options.collate || "NOT NULL" : ""}`
         )
-      }, `[${processedSource[0].name}]${[...Array(1+numOfAdditionalTabs(processedSource[0].name.length))].map((()=>"\t")).join('')}${processedSource[0].type}\t${processedSource[0].options.collate || "NOT NULL"}`)
+      }, `[${processedSource[0].name}]${[...Array(1+numOfAdditionalTabs(lengthLongestColumnName+2, processedSource[0].name.length+2))].map((()=>"\t")).join('')}${processedSource[0].type}${[...Array(1+numOfAdditionalTabs(lengthLongestColumnType, processedSource[0].type.length))].map((()=>"\t")).join('')}${(haveCollate) ? processedSource[0].options.collate || "NOT NULL" : ""}`)
     
     const externalText = 
 `use ${databaseName}
@@ -80,10 +82,9 @@ CREATE TABLE ${tablesName.stgTableName}
 CREATE TABLE ${tablesName.tableName}
 (
     ${columnsAccumulated(false)}
-,   [DT_INCLUIDO_DW]${[...Array(1+numOfAdditionalTabs(14))].map((()=>"\t")).join('')}DATETIME
-,   [DT_ALTERADO_DW]${[...Array(1+numOfAdditionalTabs(14))].map((()=>"\t")).join('')}DATETIME
-)
-`
+,   [DT_INCLUIDO_DW]${[...Array(1+numOfAdditionalTabs(lengthLongestColumnName, 14))].map((()=>"\t")).join('')}DATETIME
+,   [DT_ALTERADO_DW]${[...Array(1+numOfAdditionalTabs(lengthLongestColumnName, 14))].map((()=>"\t")).join('')}DATETIME
+)`
     
     //return externalText;
     return new Blob([externalText], {type: "application/sql"})
@@ -92,19 +93,15 @@ CREATE TABLE ${tablesName.tableName}
 function generateMergeBlob(mergeName, targetTable, sourceTable, processedSource, mergeKeys, whereClause, databaseName=false){
     const updateSetText = processedSource.slice(1).reduce((accumulator, currentColumn) => {
         return (
-`${accumulator}
-,   [${currentColumn.name}] = SOURCE.[${currentColumn.name}]
-`
+`${accumulator}\n               ,    [${currentColumn.name}]${[...Array(4+numOfAdditionalTabs(lengthLongestColumnName, currentColumn.name.length+2))].map(()=>"\t").join('')}= SOURCE.[${currentColumn.name}]`
         )
-      }, `   [${processedSource[0].name}] = SOURCE.[${processedSource[0].name}]`) 
+      }, `    [${processedSource[0].name}]${[...Array(4+numOfAdditionalTabs(lengthLongestColumnName, processedSource[0].name.length+2))].map(()=>"\t").join('')}= SOURCE.[${processedSource[0].name}]`) 
     
     const insertSetText = (isSource=false) => processedSource.slice(1).reduce((accumulator, currentColumn) => {
         return (
-`${accumulator}
-,   ${isSource && "SOURCE."}[${currentColumn.name}]
-`
+`${accumulator}\n               ,   ${isSource ? "SOURCE." : ""}[${currentColumn.name}]`
         )
-      }, `   ${isSource && "SOURCE."}[${processedSource[0].name}]`) 
+      }, `   ${isSource ? "SOURCE." : ""}[${processedSource[0].name}]`) 
     
     const mergeText = 
 `USE FRISIA
@@ -126,22 +123,21 @@ MERGE ${targetTable} as TARGET
     THEN 
         UPDATE SET 
                 ${updateSetText}
-                ${!databaseName && ", DT_ALTERADO_DW = GETDATE()"}								
+            ${!databaseName ? `   ,    [DT_ALTERADO_DW]${[...Array(4+numOfAdditionalTabs(lengthLongestColumnName, 16))].map(()=>"\t").join('')}= GETDATE()` : ""}							
             
     WHEN NOT MATCHED THEN
         INSERT (				 
                 ${insertSetText()}
-                ${!databaseName && ",    DT_INCLUIDO_DW"} 					                
+            ${!databaseName ? `   ,   [DT_INCLUIDO_DW]` : ""}   					                
         )
         VALUES 
         (
                 ${insertSetText(true)}
-                ${!databaseName && ",    GETDATE()"}   				        
+            ${!databaseName ? `   ,   GETDATE()` : ""}   				        
         );
 update 	Frisia.dbo.PARAMETRO  set [DT_EXECUCAO] = getdate() 
 where [NM_PARAMETRO] = ${mergeName}
-GO
-`
+GO`
 
     //return mergeText;
     return new Blob([mergeText], {type: "application/sql"})

@@ -116,7 +116,7 @@ export default function Home(){
                         <label htmlFor="whereClause">Where Clause </label>
                         <select name="whereClause" id="whereClause" disabled={processedSource==null}>
                             {processedSource && processedSource.map((column, index) => {
-                                return <option key={index} value={index}> {column.name}</option>
+                                return <option key={index} value={column.name}> {column.name}</option>
                             })}
                         </select>
                     </PhaseDiv>
