@@ -1,7 +1,9 @@
+import { StyledHeader } from "../Styles/Header.styled"
+
 export default function Header(){
     return (
-        <div>
-            <h1>Welcome!</h1>
-        </div>
+        <StyledHeader>
+            <img src="../public/Images/logo.png" alt="Frisia Logo" />
+        </StyledHeader>
     )
 }
