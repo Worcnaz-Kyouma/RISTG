@@ -5,8 +5,8 @@ const pseudoDb ={
             originName: "EBS",
             databaseName: "Mirror2EBS",
             polyBaseLocation: ["OracleEBS", "GOLD.APPS."],
-            tableConvention: (externalName) => externalName.toLowerCase(),
-            mergeConvention: (externalName, type) => `SP_FRISIA_MRG_${type.toUpperCase()}_${externalName.toUpperCase()}`
+            tableConvention: (externalName) => externalName.toLowerCase().replace(/xxfr_|vw_|dw_/gi,''),
+            mergeConvention: (externalName, type) => `SP_FRISIA_MRG_${type.toUpperCase()}_${externalName.toUpperCase().replace(/xxfr_|vw_|dw_/gi,'')}`
 
             
         },
