@@ -10,6 +10,7 @@ export const StyledHeader = styled.div`
 
         display: block;
         width: 6.5%;
+        min-width: 120px;
         height: 80%;
 
         top: 50%;

@@ -6,6 +6,10 @@ export const PhasesBarWrapper = styled.div`
     flex-basis: 40px;
 `
 
+export const Body = styled.div`
+    margin-top: 50px;
+`
+
 export const PhasesForm = styled.form`
     display: flex;
     flex-direction: column;
@@ -15,10 +19,32 @@ export const PhasesForm = styled.form`
 `
 
 export const PhaseDiv = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+
     width: 90%;
-    height: 100px;
-    background-color: rgb(233, 233, 233);
-    border-bottom-left-radius: 25px 8px;
-    border-bottom-right-radius: 25px 8px;
+
+    padding: 0px 30px 0px 30px;
+
+    margin-bottom: 50px;
+
+    border-bottom-left-radius: 40px 30px;
+    border-bottom-right-radius: 40px 30px;
     border-bottom: 2px solid black;
+
+    div{
+
+    }
+
+    div.w-tc-editor{
+        border-radius: 15px; 
+        background-color: #f5f5f5;
+        color: black;
+        font-size: 16px;
+        font-family: 'Consolas';
+        margin-bottom: 25px;
+    }
 `
