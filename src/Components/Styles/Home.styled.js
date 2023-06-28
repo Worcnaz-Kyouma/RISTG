@@ -27,7 +27,7 @@ export const PhaseDiv = styled.div`
 
     width: 90%;
 
-    padding: 0px 30px 0px 30px;
+    padding: 0px 75px 0px 75px;
 
     margin-bottom: 50px;
 
