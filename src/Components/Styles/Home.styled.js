@@ -2,9 +2,9 @@ import styled from "styled-components";
 
 export const PhasesBarWrapper = styled.div`
     display: flex;
-    flex-grow: 2;
     flex-basis: 40px;
-    max-width: 20%;
+    flex-grow: 1;
+    max-width: 10%;
 `
 
 export const Body = styled.div`
@@ -16,8 +16,8 @@ export const PhasesForm = styled.form`
     flex-direction: column;
     align-items: center;
     
-    flex-grow: 8;
-    max-width: 80%;
+    flex-grow: 9;
+    max-width: 90%;
 `
 
 export const PhaseDiv = styled.div`
@@ -55,13 +55,13 @@ export const PhaseKeysDiv = styled(PhaseDiv)`
     flex-direction: column;
 
     div.w-tc-editor,textarea.w-tc-editor-text{
-        width: 90%;
-        min-height: 300px;
+        width: 60%;
+        min-height: 200px;
         resize: none;
     }
     div.w-tc-editor-preview{
-        width: 90%;
-        min-height: 300px !important;
+        width: 100%;
+        min-height: 200px !important;
         resize: none;
     }
 `
