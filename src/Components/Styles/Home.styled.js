@@ -27,7 +27,7 @@ export const PhaseDiv = styled.div`
 
     width: 90%;
 
-    padding: 0px 75px 0px 75px;
+    padding: 0px 50px 0px 50px;
 
     margin-bottom: 50px;
 
@@ -39,12 +39,13 @@ export const PhaseDiv = styled.div`
 
     }
 
-    div.w-tc-editor{
+    div.w-tc-editor,textarea.w-tc-editor-text{
         border-radius: 15px; 
         background-color: #f5f5f5;
         color: black;
         font-size: 16px;
         font-family: 'Consolas';
         margin-bottom: 25px;
+        padding: 8px !important;
     }
 `

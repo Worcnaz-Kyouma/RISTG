@@ -5,7 +5,7 @@ import { Flex } from '../Styles/Flex.styled'
 import { useState } from 'react'
 import { useRef } from 'react'
 
-import CodeEditor from '@uiw/react-textarea-code-editor'
+import SQLText from '../Utils/SQLText'
 
 import pseudoDb from '../../content'
 import { processExternalSource, generateFiles } from '../../Utils'
@@ -75,59 +75,71 @@ export default function Home(){
                                     })}
                                 </select>
                             </div>
-                            <CodeEditor
-                                value={"use Mirror2BS\n.\n.\n.\n[OracleEBS],LOCATION = N'GOLD.APPS...')"}
-                                language="sql"
-                            />
+                            <SQLText value={`use ${pseudoDb.origins[originId].databaseName} \n.\n.\n.\n[${pseudoDb.origins[originId].polyBaseLocation[0]}],LOCATION = N'${pseudoDb.origins[originId].polyBaseLocation[1]}..`} />
                         </PhaseDiv>
                         <PhaseDiv>
-                        <label htmlFor="type">Type </label>
-                            <select name="type" id="type" onChange={(event)=>{
-                                setType(event.target.value)
-                                stgMergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(externalName, "STG")
-                                mergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(externalName, event.target.value)
-                            }}>
-                                <option value="FAT">FAT</option>
-                                <option value="DIM">DIM</option>
-                            </select>
+                            <div>
+                                <label htmlFor="type">Type </label>
+                                <select name="type" id="type" onChange={(event)=>{
+                                    setType(event.target.value)
+                                    stgMergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(externalName, "STG")
+                                    mergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(externalName, event.target.value)
+                                }}>
+                                    <option value="FAT">FAT</option>
+                                    <option value="DIM">DIM</option>
+                                </select>
+                            </div>
+                            <SQLText value={`CREATE TABLE Frisia.${type.toLowerCase()}...\n.\n.\n.\nCREATE PROCEDURE [dbo]SP_FRISIA_MRG_${type}...`} />
                         </PhaseDiv>
                         <PhaseDiv>
-                            <label htmlFor="externalName">External Name </label>
-                            <input type="text" name='externalName' onChange={(event) => {
-                                setExternalName(event.target.value)
-                                tableNameDOMRef.current.value = pseudoDb.origins[originId].tableConvention(event.target.value)
-                                stgMergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(event.target.value, "STG")
-                                mergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(event.target.value, type)
-                            }}/>
+                            <div>
+                                <label htmlFor="externalName">External Name </label>
+                                <input type="text" name='externalName' onChange={(event) => {
+                                    setExternalName(event.target.value)
+                                    tableNameDOMRef.current.value = pseudoDb.origins[originId].tableConvention(event.target.value)
+                                    stgMergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(event.target.value, "STG")
+                                    mergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(event.target.value, type)
+                                }}/>
+                            </div>
+                            <SQLText value={`CREATE EXTERNAL TABLE ${externalName}`} />
                         </PhaseDiv>
                         <PhaseDiv>
-                            <label htmlFor="tableName">Tables Name </label>
-                            <input type="text" name='tableName' defaultValue={pseudoDb.origins[originId].tableConvention(externalName)} ref={tableNameDOMRef}/>
+                            <div>
+                                <label htmlFor="tableName">Tables Name </label>
+                                <input type="text" name='tableName' defaultValue={pseudoDb.origins[originId].tableConvention(externalName)} ref={tableNameDOMRef}/>
+                            </div>
                         </PhaseDiv>
                         <PhaseDiv>
-                        <label htmlFor="stgMergeName">STG Merge </label>
-                            <input type="text" name='stgMergeName' defaultValue={pseudoDb.origins[originId].mergeConvention(externalName, "STG")} ref={stgMergeNameDOMRef}/>
-                            <br />
-                            <label htmlFor="mergeName">{type} Merge </label>
-                            <input type="text" name='mergeName' defaultValue={pseudoDb.origins[originId].mergeConvention(externalName, type)} ref={mergeNameDOMRef}/>
+                            <div>
+                                <label htmlFor="stgMergeName">STG Merge </label>
+                                <input type="text" name='stgMergeName' defaultValue={pseudoDb.origins[originId].mergeConvention(externalName, "STG")} ref={stgMergeNameDOMRef}/>
+                                <label htmlFor="mergeName">{type} Merge </label>
+                                <input type="text" name='mergeName' defaultValue={pseudoDb.origins[originId].mergeConvention(externalName, type)} ref={mergeNameDOMRef}/>
+                            </div>
                         </PhaseDiv>
                         <PhaseDiv>
-                            <label htmlFor="source">External source </label>
-                            <input type="text" name='source' onChange={event => {
-                                setProcessedSource(processExternalSource(event.target.value))
-                            }}/>
+                            <div>
+                                <label htmlFor="source">External source </label>
+                                <input type="text" name='source' onChange={event => {
+                                    setProcessedSource(processExternalSource(event.target.value))
+                                }}/>
+                            </div>
                         </PhaseDiv>
                         <PhaseDiv>
-                            <label htmlFor="whereClause">Where Clause </label>
-                            <select name="whereClause" id="whereClause" disabled={processedSource==null}>
-                                {processedSource && processedSource.map((column, index) => {
-                                    return <option key={index} value={column.name}> {column.name}</option>
-                                })}
-                            </select>
+                            <div>
+                                <label htmlFor="whereClause">Where Clause </label>
+                                <select name="whereClause" id="whereClause" disabled={processedSource==null}>
+                                    {processedSource && processedSource.map((column, index) => {
+                                        return <option key={index} value={column.name}> {column.name}</option>
+                                    })}
+                                </select>
+                            </div>
                         </PhaseDiv>
                         <PhaseDiv>
-                            <label htmlFor="mergeKeys">Merge Keys </label>
-                            <input type="text" name='mergeKeys'/>
+                            <div>
+                                <label htmlFor="mergeKeys">Merge Keys </label>
+                                <input type="text" name='mergeKeys'/>
+                            </div>
                         </PhaseDiv>
                         <button>Submit</button>
                     </PhasesForm>
