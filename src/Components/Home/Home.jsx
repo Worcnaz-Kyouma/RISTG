@@ -16,12 +16,14 @@ import { saveAs } from 'file-saver'
 export default function Home(){
     const [ originId, setOriginId ] = useState(0)
     const [ type, setType ] = useState("FAT")
+
     const [ externalName, setExternalName ] = useState("")
+    const [ tablesName, setTablesName ] = useState("")
+    const [ mergesName, setMergesName ] = useState("")
+    const [whereClauseColumn, setWhereClauseColumn] = useState("")
+
     const [ processedSource, setProcessedSource ] = useState(null)
 
-    const tableNameDOMRef = useRef(null)
-    const stgMergeNameDOMRef = useRef(null)
-    const mergeNameDOMRef = useRef(null)
 
     const [ currentPhase, setCurrentPhase ] = useState(1)
 
@@ -66,9 +68,8 @@ export default function Home(){
                                 <select name="origin" id="origin"
                                  onChange={(event)=>{
                                     setOriginId(event.target.value)
-                                    tableNameDOMRef.current.value = pseudoDb.origins[event.target.value].tableConvention(externalName)
-                                    stgMergeNameDOMRef.current.value = pseudoDb.origins[event.target.value].mergeConvention(externalName, "STG")
-                                    mergeNameDOMRef.current.value = pseudoDb.origins[event.target.value].mergeConvention(externalName, type)
+                                    setTablesName(pseudoDb.origins[event.target.value].tableConvention(externalName))
+                                    setMergesName(pseudoDb.origins[event.target.value].mergeConvention(externalName))
                                 }}>
                                     {pseudoDb.origins.map((origin, index) => {
                                         return <option key={index} value={index}> {origin.originName}</option>
@@ -82,8 +83,6 @@ export default function Home(){
                                 <label htmlFor="type">Type </label>
                                 <select name="type" id="type" onChange={(event)=>{
                                     setType(event.target.value)
-                                    stgMergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(externalName, "STG")
-                                    mergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(externalName, event.target.value)
                                 }}>
                                     <option value="FAT">FAT</option>
                                     <option value="DIM">DIM</option>
@@ -96,9 +95,8 @@ export default function Home(){
                                 <label htmlFor="externalName">External Name </label>
                                 <input type="text" name='externalName' onChange={(event) => {
                                     setExternalName(event.target.value)
-                                    tableNameDOMRef.current.value = pseudoDb.origins[originId].tableConvention(event.target.value)
-                                    stgMergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(event.target.value, "STG")
-                                    mergeNameDOMRef.current.value = pseudoDb.origins[originId].mergeConvention(event.target.value, type)
+                                    setTablesName(pseudoDb.origins[originId].tableConvention(event.target.value))
+                                    setMergesName(pseudoDb.origins[originId].mergeConvention(event.target.value))
                                 }}/>
                             </div>
                             <SQLText value={`CREATE EXTERNAL TABLE ${externalName}`} />
@@ -106,40 +104,43 @@ export default function Home(){
                         <PhaseDiv>
                             <div>
                                 <label htmlFor="tableName">Tables Name </label>
-                                <input type="text" name='tableName' defaultValue={pseudoDb.origins[originId].tableConvention(externalName)} ref={tableNameDOMRef}/>
+                                <input type="text" name='tableName' value={tablesName} onChange={(event) => setTablesName(event.target.value)}/>
                             </div>
+                            <SQLText value={`CREATE TABLE Frisia.stg.${pseudoDb.origins[originId].tableTemplatePrefix}${tablesName}\n.\n.\n.\nCREATE TABLE Frisia.${type.toLowerCase()}.${pseudoDb.origins[originId].tableTemplatePrefix}${tablesName}`}/>
                         </PhaseDiv>
                         <PhaseDiv>
                             <div>
-                                <label htmlFor="stgMergeName">STG Merge </label>
-                                <input type="text" name='stgMergeName' defaultValue={pseudoDb.origins[originId].mergeConvention(externalName, "STG")} ref={stgMergeNameDOMRef}/>
-                                <label htmlFor="mergeName">{type} Merge </label>
-                                <input type="text" name='mergeName' defaultValue={pseudoDb.origins[originId].mergeConvention(externalName, type)} ref={mergeNameDOMRef}/>
+                                <label htmlFor="mergeName">Merges Name </label>
+                                <input type="text" name='mergeName' value={mergesName} onChange={(event) => setMergesName(event.target.value)}/>
                             </div>
+                            <SQLText value={`CREATE PROCEDURE [dbo].${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(mergesName)}\n.\n.\n.\nCREATE PROCEDURE [dbo].${pseudoDb.origins[originId].mergeTemplatePrefix}_${type}_${pseudoDb.origins[originId].mergeConvention(mergesName)}`}/>
                         </PhaseDiv>
                         <PhaseDiv>
                             <div>
                                 <label htmlFor="source">External source </label>
                                 <input type="text" name='source' onChange={event => {
                                     setProcessedSource(processExternalSource(event.target.value))
+                                    setWhereClauseColumn(processExternalSource(event.target.value)[0].name)
                                 }}/>
                             </div>
                         </PhaseDiv>
                         <PhaseDiv>
                             <div>
-                                <label htmlFor="whereClause">Where Clause </label>
-                                <select name="whereClause" id="whereClause" disabled={processedSource==null}>
+                                <label htmlFor="whereClauseSelect">Where Clause </label>
+                                <select name="whereClauseSelect" id="whereClauseSelect" disabled={processedSource==null} value={whereClauseColumn} onChange={event => setWhereClauseColumn(event.target.value)}>
                                     {processedSource && processedSource.map((column, index) => {
                                         return <option key={index} value={column.name}> {column.name}</option>
                                     })}
                                 </select>
                             </div>
+                            <SQLText name="whereClause" editable="true" value={`where ${whereClauseColumn} >= \ncase\nwhen @controlaData = 1 then\n(\n\tselect DT_RETRO\n\tfrom dbo.PARAMETRO\n\twhere NM_PARAMETRO = 'SP_FRISIA_MRG_STG_NF_SAIDA_LIN'\n)\nelse '1910-01-01'\nend`}/>
                         </PhaseDiv>
                         <PhaseDiv>
                             <div>
                                 <label htmlFor="mergeKeys">Merge Keys </label>
-                                <input type="text" name='mergeKeys'/>
+                                <SQLText name='mergeKeys' editable='true'/>
                             </div>
+                            
                         </PhaseDiv>
                         <button>Submit</button>
                     </PhasesForm>

@@ -5,8 +5,10 @@ const pseudoDb ={
             originName: "EBS",
             databaseName: "Mirror2EBS",
             polyBaseLocation: ["OracleEBS", "GOLD.APPS."],
+            tableTemplatePrefix: "",
             tableConvention: (externalName) => externalName.toLowerCase().replace(/xxfr_|vw_|dw_/gi,''),
-            mergeConvention: (externalName, type) => `SP_FRISIA_MRG_${type.toUpperCase()}_${externalName.toUpperCase().replace(/xxfr_|vw_|dw_/gi,'')}`
+            mergeTemplatePrefix: "SP_FRISIA_MRG",
+            mergeConvention: (externalName) => externalName.toUpperCase().replace(/xxfr_|vw_|dw_/gi,'')
 
             
         },
@@ -14,8 +16,10 @@ const pseudoDb ={
             originName: "SIF",
             databaseName: "Mirror1SIF",
             polyBaseLocation: ["OracleBCAP", "BCAP.ORASQL."],
-            tableConvention: (externalName) => "sif_" + externalName.toLowerCase(),
-            mergeConvention: (externalName, type) => `SP_FRISIA_MRG_SIF_${type}_${externalName.toUpperCase()}`
+            tableTemplatePrefix: "sif_",
+            tableConvention: (externalName) => externalName.toLowerCase(),
+            mergeTemplatePrefix: "SP_FRISIA_MRG_SIF",
+            mergeConvention: (externalName) => externalName.toUpperCase()
         }
     ],
     general: {
