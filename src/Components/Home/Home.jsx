@@ -1,9 +1,8 @@
 import Header from './Header'
 import PhasesBar from './PhasesBar'
-import { Body, PhasesBarWrapper, PhasesForm, PhaseDiv } from '../Styles/Home.styled'
+import { Body, PhasesBarWrapper, PhasesForm, PhaseDiv, PhaseKeysDiv } from '../Styles/Home.styled'
 import { Flex } from '../Styles/Flex.styled'
 import { useState } from 'react'
-import { useRef } from 'react'
 
 import SQLText from '../Utils/SQLText'
 
@@ -135,13 +134,13 @@ export default function Home(){
                             </div>
                             <SQLText name="whereClause" editable="true" value={`where ${whereClauseColumn} >= \ncase\nwhen @controlaData = 1 then\n(\n\tselect DT_RETRO\n\tfrom dbo.PARAMETRO\n\twhere NM_PARAMETRO = 'SP_FRISIA_MRG_STG_NF_SAIDA_LIN'\n)\nelse '1910-01-01'\nend`}/>
                         </PhaseDiv>
-                        <PhaseDiv>
+                        <PhaseKeysDiv>
                             <div>
                                 <label htmlFor="mergeKeys">Merge Keys </label>
-                                <SQLText name='mergeKeys' editable='true'/>
                             </div>
-                            
-                        </PhaseDiv>
+
+                            <SQLText name='mergeKeys' editable='true'/>
+                        </PhaseKeysDiv>
                         <button>Submit</button>
                     </PhasesForm>
                 </Flex>
