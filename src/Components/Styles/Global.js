@@ -3,9 +3,9 @@ import { createGlobalStyle } from "styled-components"
 const GlobalStyles = createGlobalStyle`
     body{
         margin: 0px;
-        font-family: brandon-grotesque, sans-serif;
+        font-family: 'Segoe UI';
         font-style: normal;
-        font-weight: 100;
+        font-weight: 350;
     }
 
     p {

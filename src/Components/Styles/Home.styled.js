@@ -39,6 +39,7 @@ export const PhaseDiv = styled.div`
     border-bottom: 2px solid black;
 
     div.w-tc-editor,textarea.w-tc-editor-text{
+        border: 1px dotted rgb(112, 112, 112);
         border-radius: 15px; 
         background-color: #f5f5f5;
         color: black;
@@ -54,9 +55,10 @@ export const PhaseDiv = styled.div`
 export const InputDiv = styled.div`
     display: flex;
     justify-content: space-evenly;
+    align-items: center;
     
-    width: 40%;
-    min-width: 300px;
+    width: 30%;
+    min-width: ${props => props.id=="externalSource" ? "100%" : "325px"};
     
     border: 1px solid black;
     border-left: 0px;
@@ -65,11 +67,33 @@ export const InputDiv = styled.div`
 
     padding: 20px 0px 20px 0px;
 
-    select {
+    label {
+        text-align: center;
+        font-size: 17px;
+    }
+
+    input {
+        font-size: 15px;
+
         border: 0px;
         border-radius: 8px;
 
-        padding: 5px;
+        padding: 5px 15px 5px 15px;
+
+        outline: none;
+
+        ${props => props.id=="externalSource" ? "width: 50%;" : ""}
+
+        background-color: #ededed;
+    }
+
+    select {
+        font-size: 15px;
+
+        border: 0px;
+        border-radius: 8px;
+
+        padding: 5px 15px 5px 15px;
 
         background-color: #ededed;
     }

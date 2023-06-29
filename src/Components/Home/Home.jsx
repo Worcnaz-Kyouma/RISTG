@@ -115,7 +115,7 @@ export default function Home(){
                             <SQLText value={`CREATE PROCEDURE [dbo].${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(mergesName)}\n.\n.\n.\nCREATE PROCEDURE [dbo].${pseudoDb.origins[originId].mergeTemplatePrefix}_${type}_${pseudoDb.origins[originId].mergeConvention(mergesName)}`}/>
                         </PhaseDiv>
                         <PhaseDiv>
-                            <InputDiv>
+                            <InputDiv id='externalSource'>
                                 <label htmlFor="source">External source </label>
                                 <input type="text" name='source' onChange={event => {
                                     setProcessedSource(processExternalSource(event.target.value))
@@ -125,7 +125,7 @@ export default function Home(){
                         </PhaseDiv>
                         <PhaseDiv>
                             <InputDiv>
-                                <label htmlFor="whereClauseSelect">Where Clause </label>
+                                <label htmlFor="whereClauseSelect">Where </label>
                                 <select name="whereClauseSelect" id="whereClauseSelect" disabled={processedSource==null} value={whereClauseColumn} onChange={event => setWhereClauseColumn(event.target.value)}>
                                     {processedSource && processedSource.map((column, index) => {
                                         return <option key={index} value={column.name}> {column.name}</option>
