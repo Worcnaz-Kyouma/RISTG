@@ -1,12 +1,25 @@
-# Phase
-Front-end
-  - Structure: 25%
-  - Logic: 80%
-  - Style: 0%
+![image](https://github.com/Nicolas-Prado/RISTG/assets/108674581/15d9b40a-7652-420b-acf7-8066fe8ff194)## Sobre a implementação
 
-Logic-side: 90%
-  
-# Tasks
-  - Melhorar transmissão de dados do front-end para a parte mais logica de geração dos arquivos BLOB (Priority: 3)
-  - Melhorar logica de geração dos arquivos BLOB (Priority: 1)
-  - Colocar nome na table de parametros, substituindo o 'NOME DA PROCEDURE'
+O sistema foi feito em React(Front-end) e sua logica de geração dos arquivos sql em puro JavaScript: 
+
+- Front-end
+  - React(Com Vite)
+  - Styled Components
+- Logic part
+  - Pure JS
+  - Pseudo DB
+
+## Requisitos
+
+Os requisitos do software são:
+- Node.JS e NPM(ou yarn, pode ser qualquer packeage manager)
+- Um navegador web
+
+## Como rodar o software
+
+Execute estes passos para rodar a aplicação:
+- Baixe a aplicação aqui mesmo pelo github ou a clone no diretorio desejado com git clone
+- Abra o terminar na root do projeto
+- Execute o comando "npm i" para instalar as dependencias usadas no projeto
+- Execute o comando "npm run dev" e abra a aplicação em http://localhost:5173/ em qualquer navegador
+- Pronto!
