@@ -2,7 +2,7 @@ import Header from './Header'
 import PhasesBar from './PhasesBar'
 import { Body, PhasesBarWrapper, PhasesForm, PhaseDiv, InputDiv, PhaseKeysDiv } from '../Styles/Home.styled'
 import { Flex } from '../Styles/Flex.styled'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import SQLText from '../Utils/SQLText'
 
@@ -23,8 +23,9 @@ export default function Home(){
 
     const [ processedSource, setProcessedSource ] = useState(null)
 
-
     const [ currentPhase, setCurrentPhase ] = useState(1)
+    const phasesFormRef = useRef(null)
+    const [ phasesDivCenterPositions, setPhasesDivCenterPositions ] = useState([...Array(8)])
 
     function handleSubmit(event){
         event.preventDefault()
@@ -52,15 +53,49 @@ export default function Home(){
         saveAs(files.merge, formJson.mergeName+".sql")
     }
 
+    
+    useEffect(() => {
+        let changeFlag;
+        let newPhasesDivCenterPositions;
+        const observer = new ResizeObserver(() => {
+            changeFlag = false;
+            newPhasesDivCenterPositions = phasesDivCenterPositions.map((phaseDivCenterPosition, index) => {
+                let actualCenterPosition = (()=>{
+                    let bodyRect = document.body.getBoundingClientRect()
+                    let divRect = document.querySelectorAll('form>div')[index].getBoundingClientRect()
+                    return divRect.top+(divRect.height/2) - bodyRect.top
+                })();
+                if(phaseDivCenterPosition!=actualCenterPosition){
+                    //console.log('BREAK!')
+                    changeFlag = true;
+                    return actualCenterPosition
+                }
+                else{
+                    //console.log('wait...')
+                    return phaseDivCenterPosition
+                }
+            })
+            //console.log(newPhasesDivCenterPositions)
+            if(changeFlag){
+                setPhasesDivCenterPositions(newPhasesDivCenterPositions)
+            }
+        })
+
+        observer.observe(phasesFormRef.current)
+
+        return () => observer.disconnect();
+    }, [phasesDivCenterPositions]);
+
     return(
         <>
+            {console.log(phasesDivCenterPositions)}
             <Header />
             <Body>
                 <Flex>
                     <PhasesBarWrapper>
                         <PhasesBar numberOfPhases={8} currentPhase={currentPhase}/>
                     </PhasesBarWrapper>
-                    <PhasesForm onSubmit={handleSubmit}>
+                    <PhasesForm onSubmit={handleSubmit} ref={phasesFormRef}>
                         <PhaseDiv>
                             <InputDiv>
                                 <label htmlFor="origin">Origin </label>
