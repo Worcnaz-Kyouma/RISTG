@@ -1,4 +1,4 @@
-![image](https://github.com/Nicolas-Prado/RISTG/assets/108674581/15d9b40a-7652-420b-acf7-8066fe8ff194)## Sobre a implementação
+## Sobre a implementação
 
 O sistema foi feito em React(Front-end) e sua logica de geração dos arquivos sql em puro JavaScript: 
 
