@@ -114,3 +114,31 @@ export const PhaseKeysDiv = styled(PhaseDiv)`
         min-height: 200px !important;
     }
 `
+
+export const StyledButton = styled.button`
+    width: 15%;
+    height: 50px;
+
+    border: 0px;
+    border-radius: 15px;
+
+    margin-bottom: 50px;
+
+    font-size: 17px;
+    font-family: 'Segoe UI';
+
+    cursor: pointer;
+
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: white;
+
+    transition: all 0.4s;
+
+    &:hover{
+        filter: brightness(95%);
+    }
+
+    &:active{
+        filter: brightness(80%);
+    }
+`
