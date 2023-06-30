@@ -180,7 +180,7 @@ export default function Home(){
 
                             <SQLText name='mergeKeys' editable='true' onClick={() => setCurrentPhase(8)}/>
                         </PhaseKeysDiv>
-                        <StyledButton>Submit</StyledButton>
+                        <StyledButton>Download</StyledButton>
                     </PhasesForm>
                 </Flex>
             </Body>
