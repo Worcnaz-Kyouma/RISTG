@@ -171,7 +171,7 @@ export default function Home(){
                                     })}
                                 </select>
                             </InputDiv>
-                            <SQLText name="whereClause" editable="true" value={`where ${whereClauseColumn} >= \n\t\t\t\t\tcase\n\t\t\t\t\twhen @controlaData = 1 then\n\t\t\t\t\t(\n\t\t\t\t\t\tselect DT_RETRO\n\t\t\t\t\t\tfrom dbo.PARAMETRO\n\t\t\t\t\t\twhere NM_PARAMETRO = '${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(mergesName)}'\n\t\t\t\t\t)\n\t\t\t\t\telse '1910-01-01'\n\t\t\t\t\tend`}/>
+                            <SQLText name="whereClause" editable="true" value={`\t\t\t\twhere ${whereClauseColumn} >= \n\t\t\t\t\tcase\n\t\t\t\t\twhen @controlaData = 1 then\n\t\t\t\t\t(\n\t\t\t\t\t\tselect DT_RETRO\n\t\t\t\t\t\tfrom dbo.PARAMETRO\n\t\t\t\t\t\twhere NM_PARAMETRO = '${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(mergesName)}'\n\t\t\t\t\t)\n\t\t\t\t\telse '1910-01-01'\n\t\t\t\t\tend`}/>
                         </PhaseDiv>
                         <PhaseKeysDiv onClick={() => setCurrentPhase(8)}>
                             <div>

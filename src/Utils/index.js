@@ -114,7 +114,7 @@ ${(databaseName) ? "truncate table " + targetTable : ""}
 MERGE ${targetTable} as TARGET
     USING (
             SELECT * FROM ${databaseName ? databaseName + ".dbo." : ""}${sourceTable}
-                ${whereClause ? whereClause : ""}	
+${whereClause ? whereClause : ""}	
             ) 
             AS SOURCE ON (                      		 
                 ${mergeKeys}						
