@@ -1,9 +1,10 @@
-import { ProgressBar } from "../Styles/PhasesBar.styled"
+import { ProgressBar, ProgressCircle } from "../Styles/PhasesBar.styled"
 
 export default function PhasesBar(props){
     return (
-        <ProgressBar numberOfPhases={props.numberOfPhases} currentPhase={props.currentPhase}>
-            {[...Array(props.numberOfPhases)].map((value, index) => <div key={index}></div>)}
-        </ProgressBar>
+        <>
+            <ProgressBar positions={props.progressPhasesPosition} numberOfPhases={props.numberOfPhases} currentPhase={props.currentPhase} />
+            {[...Array(props.numberOfPhases)].map((value, index) => <ProgressCircle position={props.progressPhasesPosition[index]} currentPhase={props.currentPhase} key={index}></ProgressCircle>)}
+        </>
     )
 }

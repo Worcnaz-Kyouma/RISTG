@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const PhasesBarWrapper = styled.div`
-    display: flex;
+    position: relative;
     flex-basis: 40px;
     flex-grow: 1;
     max-width: 10%;
@@ -58,7 +58,7 @@ export const InputDiv = styled.div`
     align-items: center;
     
     width: 30%;
-    min-width: ${props => props.id=="externalSource" ? "100%" : "325px"};
+    min-width: ${props => props.id=="externalSource" ? "100%" : "400px"};
     
     border: 1px solid black;
     border-left: 0px;

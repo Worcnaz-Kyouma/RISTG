@@ -1,20 +1,16 @@
 import styled from "styled-components";
 
 export const ProgressBar = styled.div`
-    position: relative;
+    position: absolute;
+    left: 50%;
+    top: ${props=>props.positions[0]-35}px;
+    transform: translateX(-50%);
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-
-    margin: auto;
     width: 5px;
-    height: 93%;
-    border-radius: 10%;
+    height: ${props=>props.positions[props.positions.length-1] - props.positions[0]}px;
 
     background-color: rgb(165, 164, 164);
-    
+
     transition: all 0.4s;
 
     &::before{
@@ -25,7 +21,7 @@ export const ProgressBar = styled.div`
         left: 0px;
 
         width: 100%;
-        height: ${({numberOfPhases, currentPhase}) => ((currentPhase-1)/(numberOfPhases-1))*100}%;
+        height: ${props=>props.positions[props.currentPhase]-50}px;
 
         border-radius: 10%;
         background-color: rgb(57, 114, 39);
@@ -34,29 +30,32 @@ export const ProgressBar = styled.div`
 
         transition: inherit;
     }
+`
 
-    div{
-        position: relative;
+export const ProgressCircle = styled.div`
+    position: absolute;
+    left: 50%;
+    top: ${props => props.position-35}px;
+    transform: translateX(-50%);
 
-        width: 40px;
-        aspect-ratio: 1;
+    width: 40px;
+    aspect-ratio: 1;
 
-        border: 4px solid white;
+    border: 4px solid white;
 
-        background-color: inherit;
+    background-color: rgb(165, 164, 164);;
 
-        border-radius: 50%;
+    border-radius: 50%;
 
-        z-index: 2;
+    z-index: 2;
 
-        transition: all 0.4s;
-    }
+    transition: all 0.4s;
 
-    div:nth-child(-n+${({currentPhase}) => currentPhase}){
+    &:nth-child(-n+${({currentPhase}) => currentPhase+2}){
         background-color: rgb(57, 114, 39);
     }
 
-    div:nth-child(${({currentPhase}) => currentPhase})::before{
+    &:nth-child(${({currentPhase}) => currentPhase+2})::before{
         content: '';
 
         position: absolute;

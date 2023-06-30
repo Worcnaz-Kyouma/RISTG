@@ -41,7 +41,7 @@ export default function Home(){
             processedSource: processedSource,
             externalName: formJson.externalName,
             tablesName: {stgTableName:"Frisia.stg."+formJson.tableName, tableName: "Frisia."+formJson.type.toLowerCase()+"."+formJson.tableName},
-            mergesName: {stgMergeName: formJson.stgMergeName, mergeName: formJson.mergeName},
+            mergesName: {stgMergeName: `${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(formJson.mergeName)}`, mergeName: `${pseudoDb.origins[originId].mergeTemplatePrefix}_${formJson.type}_${pseudoDb.origins[originId].mergeConvention(formJson.mergeName)}`},
             whereClause: formJson.whereClause,
             mergeKeys: formJson.mergeKeys
         }
@@ -49,8 +49,8 @@ export default function Home(){
         const files = generateFiles(generatingSource)
         
         saveAs(files.external, formJson.externalName+".sql")
-        saveAs(files.mergeStg, formJson.stgMergeName+".sql")
-        saveAs(files.merge, formJson.mergeName+".sql")
+        saveAs(files.mergeStg, `${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(formJson.mergeName)}`+".sql")
+        saveAs(files.merge, `${pseudoDb.origins[originId].mergeTemplatePrefix}_${formJson.type}_${pseudoDb.origins[originId].mergeConvention(formJson.mergeName)}`+".sql")
     }
 
     
@@ -61,7 +61,7 @@ export default function Home(){
             changeFlag = false;
             newPhasesDivCenterPositions = phasesDivCenterPositions.map((phaseDivCenterPosition, index) => {
                 let actualCenterPosition = (()=>{
-                    let bodyRect = document.body.getBoundingClientRect()
+                    let bodyRect = document.getElementById('content').getBoundingClientRect()
                     let divRect = document.querySelectorAll('form>div')[index].getBoundingClientRect()
                     return divRect.top+(divRect.height/2) - bodyRect.top
                 })();
@@ -88,12 +88,11 @@ export default function Home(){
 
     return(
         <>
-            {console.log(phasesDivCenterPositions)}
             <Header />
             <Body>
-                <Flex>
+                <Flex id='content'>
                     <PhasesBarWrapper>
-                        <PhasesBar numberOfPhases={8} currentPhase={currentPhase}/>
+                        <PhasesBar numberOfPhases={8} progressPhasesPosition={phasesDivCenterPositions} currentPhase={currentPhase-1}/>
                     </PhasesBarWrapper>
                     <PhasesForm onSubmit={handleSubmit} ref={phasesFormRef}>
                         <PhaseDiv>
@@ -104,7 +103,8 @@ export default function Home(){
                                     setOriginId(event.target.value)
                                     setTablesName(pseudoDb.origins[event.target.value].tableConvention(externalName))
                                     setMergesName(pseudoDb.origins[event.target.value].mergeConvention(externalName))
-                                }}>
+                                }}
+                                onClick={() => setCurrentPhase(1)}>
                                     {pseudoDb.origins.map((origin, index) => {
                                         return <option key={index} value={index}> {origin.originName}</option>
                                     })}
@@ -117,7 +117,8 @@ export default function Home(){
                                 <label htmlFor="type">Type </label>
                                 <select name="type" id="type" onChange={(event)=>{
                                     setType(event.target.value)
-                                }}>
+                                }}
+                                onClick={() => setCurrentPhase(2)}>
                                     <option value="FAT">FAT</option>
                                     <option value="DIM">DIM</option>
                                 </select>
@@ -131,21 +132,22 @@ export default function Home(){
                                     setExternalName(event.target.value)
                                     setTablesName(pseudoDb.origins[originId].tableConvention(event.target.value))
                                     setMergesName(pseudoDb.origins[originId].mergeConvention(event.target.value))
-                                }}/>
+                                }}
+                                onClick={() => setCurrentPhase(3)}/>
                             </InputDiv>
                             <SQLText value={`CREATE EXTERNAL TABLE ${externalName}`} />
                         </PhaseDiv>
                         <PhaseDiv>
                             <InputDiv>
                                 <label htmlFor="tableName">Tables Name </label>
-                                <input type="text" name='tableName' value={tablesName} onChange={(event) => setTablesName(event.target.value)}/>
+                                <input type="text" name='tableName' value={tablesName} onChange={(event) => setTablesName(event.target.value)} onClick={() => setCurrentPhase(4)}/>
                             </InputDiv>
                             <SQLText value={`CREATE TABLE Frisia.stg.${pseudoDb.origins[originId].tableTemplatePrefix}${tablesName}\n.\n.\n.\nCREATE TABLE Frisia.${type.toLowerCase()}.${pseudoDb.origins[originId].tableTemplatePrefix}${tablesName}`}/>
                         </PhaseDiv>
                         <PhaseDiv>
                             <InputDiv>
                                 <label htmlFor="mergeName">Merges Name </label>
-                                <input type="text" name='mergeName' value={mergesName} onChange={(event) => setMergesName(event.target.value)}/>
+                                <input type="text" name='mergeName' value={mergesName} onChange={(event) => setMergesName(event.target.value)} onClick={() => setCurrentPhase(5)}/>
                             </InputDiv>
                             <SQLText value={`CREATE PROCEDURE [dbo].${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(mergesName)}\n.\n.\n.\nCREATE PROCEDURE [dbo].${pseudoDb.origins[originId].mergeTemplatePrefix}_${type}_${pseudoDb.origins[originId].mergeConvention(mergesName)}`}/>
                         </PhaseDiv>
@@ -155,13 +157,15 @@ export default function Home(){
                                 <input type="text" name='source' onChange={event => {
                                     setProcessedSource(processExternalSource(event.target.value))
                                     setWhereClauseColumn(processExternalSource(event.target.value)[0].name)
-                                }}/>
+                                }}
+                                onClick={() => setCurrentPhase(6)}/>
                             </InputDiv>
                         </PhaseDiv>
                         <PhaseDiv>
                             <InputDiv>
                                 <label htmlFor="whereClauseSelect">Where </label>
-                                <select name="whereClauseSelect" id="whereClauseSelect" disabled={processedSource==null} value={whereClauseColumn} onChange={event => setWhereClauseColumn(event.target.value)}>
+                                <select name="whereClauseSelect" id="whereClauseSelect" disabled={processedSource==null} value={whereClauseColumn} onChange={event => setWhereClauseColumn(event.target.value)}
+                                onClick={() => setCurrentPhase(7)}>
                                     {processedSource && processedSource.map((column, index) => {
                                         return <option key={index} value={column.name}> {column.name}</option>
                                     })}
@@ -169,12 +173,12 @@ export default function Home(){
                             </InputDiv>
                             <SQLText name="whereClause" editable="true" value={`where ${whereClauseColumn} >= \ncase\nwhen @controlaData = 1 then\n(\n\tselect DT_RETRO\n\tfrom dbo.PARAMETRO\n\twhere NM_PARAMETRO = '${pseudoDb.origins[originId].mergeTemplatePrefix}_STG_${pseudoDb.origins[originId].mergeConvention(mergesName)}'\n)\nelse '1910-01-01'\nend`}/>
                         </PhaseDiv>
-                        <PhaseKeysDiv>
+                        <PhaseKeysDiv onClick={() => setCurrentPhase(8)}>
                             <div>
                                 <label htmlFor="mergeKeys">Merge Keys </label>
                             </div>
 
-                            <SQLText name='mergeKeys' editable='true'/>
+                            <SQLText name='mergeKeys' editable='true' onClick={() => setCurrentPhase(8)}/>
                         </PhaseKeysDiv>
                         <button>Submit</button>
                     </PhasesForm>
