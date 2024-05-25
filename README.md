@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/Nicolas-Prado/RISTG/main/icon.png" width="30%" height="20%"></p>
+
 ## Sobre a implementação
 
 O sistema foi feito em React(Front-end) e sua logica de geração dos arquivos sql em puro JavaScript: 
